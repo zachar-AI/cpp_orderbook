@@ -1,4 +1,6 @@
 #include <cstdint>
+#include <list>
+#include <memory>
 #include <vector>
 #include <format>
 #include <stdexcept>
@@ -53,7 +55,7 @@ public:
     , price_ { price }
     , initialQuantity_ { quantity }
     , remainingQuantity_ { quantity }
-  {}
+  { }
 
   OrderId GetOrderId() const { return orderId_; }
   Side GetSide() const { return side_; }
@@ -77,6 +79,62 @@ private:
   Quantity remainingQuantity_;
 
 };
+
+using OrderPointer = std::shared_ptr<Order>;
+using OrderPointers = std::list<OrderPointer>;
+
+class OrderModify {
+public:
+  OrderModify(OrderId orderId, Side side, Price price, Quantity quantity)
+    : orderId_ { orderId }
+    , side_ {side}
+    , price_ {price}
+    , quantity_ {quantity}
+  {  }
+
+  OrderId GetOrderId() const { return orderId_; }
+  Side GetSide() const { return side_; }
+  Price GetPrice() const { return price_; }
+  Quantity GetQuantity() const { return quantity_; }
+
+  OrderPointer ToOrderPointer(OrderType type) const
+  {
+    return std::make_shared<Order>(type, GetOrderId(), GetSide(), GetPrice(), GetQuantity());
+  }
+
+private:
+  OrderId orderId_;
+  Side side_;
+  Price price_;
+  Quantity quantity_;
+
+};
+
+struct TradeInfo
+{
+  OrderId orderId_;
+  Price price_;
+  Quantity quantity_;
+
+};
+
+class Trade 
+{
+public:
+  Trade(const TradeInfo& bidTrade, const TradeInfo& askTrade)
+    : bidTrade_ { bidTrade }
+    , askTrade_ { askTrade }
+  { }
+   
+  const TradeInfo& GetBidTrade() const { return bidTrade_; }
+  const TradeInfo& GetAskTrade() const { return askTrade_; }
+
+private:
+  TradeInfo bidTrade_;
+  TradeInfo askTrade_;
+};
+
+using Trades = std::vector<Trade>;
 
 int main ()
 {
