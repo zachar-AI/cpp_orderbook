@@ -213,8 +213,37 @@ private:
           asks.pop_front();
           orders_.erase(ask->GetOrderId());
         }
+
+        if (bids.empty())
+          bids_.erase(bidPrice);
+
+        if (asks.empty())
+          asks_.erase(askPrice);
+
+        trades.push_back(
+          Trade{ TradeInfo{ bid->GetOrderId(), bid->GetPrice(), quantity },
+                 TradeInfo{ ask->GetOrderId(), ask->GetPrice(), quantity } });
       }
     }
+
+    if (!bids_.empty())
+    {
+      auto& [_, bids] = *bids_.begin();
+      auto& order = bids.front();
+      if (order->GetOrderType() == OrderType::FillAndKill)
+        CancelOrder(order->GetOrderId());
+    }
+    
+    if (!asks_.empty())
+    {
+      auto& [_, asks] = *asks_.begin();
+      auto& order = asks.front();
+      if (order->GetOrderType() == OrderType::FillAndKill)
+        CancelOrder(order->GetOrderId());
+    }
+
+    return trades;
+
   }
 };
 
