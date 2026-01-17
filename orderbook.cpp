@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <vector>
 #include <format>
+#include <stdexcept>
 
 enum class OrderType
 {
@@ -30,8 +31,8 @@ class OrderbookLevelInfos
 {
 public:
   OrderbookLevelInfos(const LevelInfos& bids, const LevelInfos& asks)
-    : bids_ { bids }
-    , asks_ { asks }
+    : bids_ ( bids )
+    , asks_ ( asks )
   { }
 
   const LevelInfos& GetBids() const { return bids_; }
@@ -60,11 +61,11 @@ public:
   OrderType GetOrderType() const { return orderType_; }
   Quantity GetInitialQuantity() const { return initialQuantity_; }
   Quantity GetRemainingQuantity() const { return remainingQuantity_; }
-  Quantity GetFilledQuantity() const { return GetInitialQuantity() - GetFilledQuantity(); }
+  Quantity GetFilledQuantity() const { return GetInitialQuantity() - GetRemainingQuantity(); }
   void Fill(Quantity quantity)
   {
     if (quantity > GetRemainingQuantity())
-      throw std::logic_error(std::format("Order ({}) cannot be filled for more than its remaining quantity."));
+      throw std::logic_error(std::format("Order ({}) cannot be filled for more than its remaining quantity", GetOrderId()));
     remainingQuantity_ -= quantity;
   }
 private:

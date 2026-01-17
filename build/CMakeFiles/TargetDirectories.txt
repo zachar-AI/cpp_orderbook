@@ -1,3 +1,0 @@
-/Users/hookline/coding/learning/cpp_orderbook/build/CMakeFiles/orderbook.dir
-/Users/hookline/coding/learning/cpp_orderbook/build/CMakeFiles/edit_cache.dir
-/Users/hookline/coding/learning/cpp_orderbook/build/CMakeFiles/rebuild_cache.dir
