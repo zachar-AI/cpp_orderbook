@@ -1,6 +1,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <iostream>
 #include <list>
 #include <map>
 #include <memory>
@@ -283,7 +284,6 @@ public:
       return;
 
     const auto& [order, iterator] = orders_.at(orderId);
-    orders_.erase(orderId);
 
     if (order->GetSide() == Side::Sell)
     {
@@ -301,6 +301,8 @@ public:
       if (orders.empty())
         bids_.erase(price);
     }
+
+    orders_.erase(orderId);
   }
   
   Trades MatchOrder(OrderModify order)
@@ -324,7 +326,7 @@ public:
     auto CreateLevelInfos = [](Price price, const OrderPointers& orders)
     {
       return LevelInfo{price, std::accumulate(orders.begin(), orders.end(), (Quantity)0, 
-          [](std::size_t runningSum, const OrderPointer& order)
+          [](Quantity runningSum, const OrderPointer& order)
           { return runningSum + order->GetRemainingQuantity(); }) };
     };
 
@@ -341,5 +343,12 @@ public:
 
 int main ()
 {
+  Orderbook orderbook;
+  const OrderId orderId = 1;
+  orderbook.AddOrder(std::make_shared<Order>(OrderType::GoodTilCanel, orderId, Side::Buy, 100, 10));
+  std::cout << orderbook.Size() << '\n';
+  orderbook.CancelOrder(orderId);
+  std::cout << orderbook.Size() << '\n';
+
   return 0;
 }
